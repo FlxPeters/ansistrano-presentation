@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Ansistrano</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/blood.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section data-markdown>
+            <script type="text/template">
+                # Ansistrano
+                A short introduction
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Whats Ansistrano?
+
+                > Ansible role to deploy scripting applications like PHP, Python, Ruby, etc. in a capistrano style
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## History
+                Ansistrano comes from Ansible + Capistrano
+                * Started in August 2014 by carlosbuenosvinos
+                * 36 contributors (September 2016)
+                * Replacement for Capistrano
+                * MIT License
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## Requirements & Installation
+
+                * Python
+                * Ansible (>= 1.8)
+
+                ```
+                $ ansible-galaxy install carlosbuenosvinos.ansistrano-deploy
+                  carlosbuenosvinos.ansistrano-rollback
+                ```
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Features
+
+                * Customize your deployment with hooks
+                * Choose between many deploy strategies
+                  * SCP (push)
+                  * RSYNC (push)
+                  * GIT (pull)
+                  * Download (HTTP Get)
+                  * S3 (get)
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Workflow
+
+                ![Workflow](https://raw.githubusercontent.com/ansistrano/deploy/master/docs/ansistrano-flow.png)
+
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Directory structure
+                ```
+                -- /var/www/my-app.com
+                |-- current -> /var/www/my-app.com/releases/20100512131539
+                |-- releases
+                |   |-- 20100512131539
+                |       |-- logs -> ../../shared/logs
+                |       |-- config.php -> ../../shared/config.php
+                |   |-- 20100509150741
+                |   |-- 20100509145325
+                |-- shared (shared files between releases)
+                |   |-- logs
+                |   |-- config.php
+                ```
+                * Shared files are symlinked in the release folder
+                * Current is a symlink to the current release
+
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Example Playbook
+                ```
+                ---
+                - name: Deploy example app to my-server.com
+                  hosts: all
+                  vars:
+                    ansistrano_deploy_from: "{{ playbook_dir }}"
+                    ansistrano_deploy_to: "/var/www/my-app.com"
+                    ansistrano_keep_releases: 3
+                    ansistrano_deploy_via: copy
+                    ansistrano_shared_paths: ["logs", "config.php"]
+                  roles:
+                    - { role: carlosbuenosvinos.ansistrano-deploy }
+                ```
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Hooks & custom tasks
+                ```
+                -- /project-dir/my-app.com
+                |-- hosts (inventory)
+                |-- deploy.yml (playbook)
+                |-- index.html (your app)
+                |-- my-custom-tasks (hooks)
+                |   |-- before-code-update.yml
+                |   |-- after-code-update.yml
+                |   |-- before-symlink.yml
+                |   |-- after-symlink.yml
+                |   |-- before-cleanup.yml
+                |   |-- after-cleanup.yml
+                ```
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Examples
+
+                * Reload apache after changing the symlink
+
+                ```
+                after-symlink.yml
+
+                - name: Restart Apache
+                  service: name=httpd state=reloaded
+                ```
+
+                * Add and remove server from loadbalancing
+                * Send a signal or email to monitoring
+                * change file permissions
+
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Multistage environment
+
+                * Use multiple inventory files
+                * Use group or host vars for environment specific settings
+
+                ```
+                ansible-playbook -i hosts_devel deploy.yml
+                ansible-playbook -i hosts_preprod deploy.yml
+                ansible-playbook -i hosts_prod deploy.yml
+                ```
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                ## Rolling back
+
+                * use the rollback role in your playbook
+                * hooks may be shared with the deploy playbook
+
+                ```
+                ---
+                - name: Rollback example app to my-server.com
+                  hosts: all
+                  vars:
+                    ansistrano_deploy_to: "/var/www/my-app.com"
+                  roles:
+                    - { role: carlosbuenosvinos.ansistrano-rollback }
+                ```
+            </script>
+        </section>
+
+    </div>
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        history: true,
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/notes/notes.js', async: true},
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            }
+        ]
+    });
+</script>
+</body>
+</html>
