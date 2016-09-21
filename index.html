@@ -32,16 +32,16 @@
         </section>
         <section data-markdown>
             <script type="text/template">
-                ## Whats Ansistrano?
+                ## What's Ansistrano?
 
-                > Ansible role to deploy scripting applications like PHP, Python, Ruby, etc. in a capistrano style
+                > An Ansible role to deploy scripting applications like PHP, Python, Ruby, etc. in a Capistrano style
             </script>
         </section>
         <section data-markdown>
             <script type="text/template">
                 ## History
                 Ansistrano comes from Ansible + Capistrano
-                * Started in August 2014 by carlosbuenosvinos
+                * Started in August 2014 by *carlosbuenosvinos*
                 * 36 contributors (September 2016)
                 * Replacement for Capistrano
                 * MIT License
@@ -50,14 +50,21 @@
 
         <section data-markdown>
             <script type="text/template">
-                ## Requirements & Installation
+                ## Requirements
 
                 * Python
                 * Ansible (>= 1.8)
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## Installation
+
 
                 ```
                 $ ansible-galaxy install carlosbuenosvinos.ansistrano-deploy
-                  carlosbuenosvinos.ansistrano-rollback
+                carlosbuenosvinos.ansistrano-rollback
                 ```
             </script>
         </section>
@@ -66,12 +73,12 @@
                 ## Features
 
                 * Customize your deployment with hooks
-                * Choose between many deploy strategies
-                  * SCP (push)
-                  * RSYNC (push)
-                  * GIT (pull)
-                  * Download (HTTP Get)
-                  * S3 (get)
+                * Choose between many deployment strategies
+                    * SCP (push)
+                    * RSYNC (push)
+                    * GIT (pull)
+                    * Download (HTTP Get)
+                    * S3 (get)
             </script>
         </section>
         <section data-markdown>
@@ -99,7 +106,7 @@
                 |   |-- config.php
                 ```
                 * Shared files are symlinked in the release folder
-                * Current is a symlink to the current release
+                * "current" is a symlink to the current release
 
             </script>
         </section>
@@ -108,16 +115,16 @@
                 ## Example Playbook
                 ```
                 ---
-                - name: Deploy example app to my-server.com
-                  hosts: all
-                  vars:
-                    ansistrano_deploy_from: "{{ playbook_dir }}"
-                    ansistrano_deploy_to: "/var/www/my-app.com"
-                    ansistrano_keep_releases: 3
-                    ansistrano_deploy_via: copy
-                    ansistrano_shared_paths: ["logs", "config.php"]
-                  roles:
-                    - { role: carlosbuenosvinos.ansistrano-deploy }
+                -   name: Deploy example app to my-server.com
+                    hosts: all
+                    vars:
+                        ansistrano_deploy_from: "{{ playbook_dir }}"
+                        ansistrano_deploy_to: "/var/www/my-app.com"
+                        ansistrano_keep_releases: 3
+                        ansistrano_deploy_via: copy
+                        ansistrano_shared_paths: ["logs", "config.php"]
+                    roles:
+                        - { role: carlosbuenosvinos.ansistrano-deploy }
                 ```
             </script>
         </section>
@@ -143,7 +150,7 @@
             <script type="text/template">
                 ## Examples
 
-                * Reload apache after changing the symlink
+                * Reload Apache after changing the symlink
 
                 ```
                 after-symlink.yml
@@ -152,9 +159,9 @@
                   service: name=httpd state=reloaded
                 ```
 
-                * Add and remove server from loadbalancing
+                * Add and remove server from load balancing
                 * Send a signal or email to monitoring
-                * change file permissions
+                * Change file permissions
 
             </script>
         </section>
@@ -163,7 +170,7 @@
                 ## Multistage environment
 
                 * Use multiple inventory files
-                * Use group or host vars for environment specific settings
+                * Use *groupvars* or *hostvars* for environment specific settings
 
                 ```
                 ansible-playbook -i hosts_devel deploy.yml
@@ -176,8 +183,8 @@
             <script type="text/template">
                 ## Rolling back
 
-                * use the rollback role in your playbook
-                * hooks may be shared with the deploy playbook
+                * Use the rollback role in your playbook
+                * Hooks may be shared with your deployment playbook
 
                 ```
                 ---
